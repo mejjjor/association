@@ -90,7 +90,7 @@ module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned"
   	this.lastCallTs = ''
   	this.objectId = ''
   	self.update()
-    console.log("asso has registered");
+    console.log("asso has registered")
     opts.eventBus.trigger('showAll')
 }
 });

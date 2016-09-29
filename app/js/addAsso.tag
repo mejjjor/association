@@ -85,7 +85,8 @@
 		}
 		else{
 			this.lastCallTs = new Date(this.lastCall).getTime()
-			this.nbCall = 1
+			if (this.objectId == '')
+				this.nbCall = 1
 		}
         var associationObject = new Association({
 	    name: this.name,

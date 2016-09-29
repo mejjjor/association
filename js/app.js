@@ -62,7 +62,8 @@ module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned"
 		}
 		else{
 			this.lastCallTs = new Date(this.lastCall).getTime()
-			this.nbCall = 1
+			if (this.objectId == '')
+				this.nbCall = 1
 		}
         var associationObject = new Association({
 	    name: this.name,
@@ -94,32 +95,70 @@ module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned"
     opts.eventBus.trigger('showAll')
 }
 });
-},{"./Association.js":1,"moment":10,"riot":15}],3:[function(require,module,exports){
+},{"./Association.js":1,"moment":11,"riot":16}],3:[function(require,module,exports){
 'use strict';
 
 var riot = require('riot');
 var Backendless = require('backendless');
 var addAsso = require('./addAsso.tag');
 var addAsso = require('./showAssos.tag');
-
+var addAsso = require('./login.tag');
 var APP_ID = "FFDC7C5B-9461-2230-FF25-390A64FE4400";
 var SECRET_KEY = "0DBD0BF2-7A45-1048-FFA7-B88507C8BF00";
 var VERSION = "v1";
-
 var eventBus;
-
 var domReady = function domReady(callback) {
     document.readyState === "interactive" || document.readyState === "complete" ? callback() : document.addEventListener("DOMContentLoaded", callback);
 };
-
 domReady(function () {
     Backendless.initApp(APP_ID, SECRET_KEY, VERSION);
     Backendless.enablePromises();
     eventBus = riot.observable();
-    riot.mount('*', { eventBus: eventBus, Backendless: Backendless });
+    var currentUser = Backendless.UserService.loggedInUser();
+    riot.mount('*', {
+        eventBus: eventBus,
+        Backendless: Backendless,
+        currentUser: currentUser
+    });
 });
 
-},{"./addAsso.tag":2,"./showAssos.tag":4,"backendless":5,"riot":15}],4:[function(require,module,exports){
+},{"./addAsso.tag":2,"./login.tag":4,"./showAssos.tag":5,"backendless":6,"riot":16}],4:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag2('login', '<form> <div if="{opts.currentUser == undefined}"> <input type="login" name="login" value="{login}" onchange="{edit}" placeholder="login"> <input type="password" name="password" value="{password}" onchange="{edit}" placeholder="password"> <button type="submit" onclick="{connect}">Login</button> </div> <div if="{opts.currentUser != undefined}"> <button type="submit" onclick="{unConnect}">Logout</button> </div> </form>', '', '', function(opts) {
+this.login= ''
+this.password = ''
+var self = this
+
+this.edit = function(e){
+	this[e.target.name] = e.target.value
+}.bind(this)
+
+this.connect = function(e){
+	opts.Backendless.UserService.login(this.login, this.password, true, new Backendless.Async(userLoggedIn, gotError))
+	self.update()
+}.bind(this)
+
+this.unConnect = function(e){
+	Backendless.UserService.logout( asyncCallback )
+    function asyncCallback(){    }
+    opts.currentUser = undefined
+    self.update()
+}.bind(this)
+
+function userLoggedIn(user) {
+	opts.currentUser = user.objectId
+    console.log("user has logged in")
+    self.update()
+    }
+
+    function gotError(err)
+    {
+        console.log("error message - " + err.message);
+        console.log("error code - " + err.statusCode);
+    }
+
+});
+},{"riot":16}],5:[function(require,module,exports){
 var riot = require('riot');
 module.exports = riot.tag2('showassos', '<div> <p>{count}</p> <button onclick="{showAll}">All</button> <button onclick="{showMustCall}">To recall</button> <button onclick="{showDoneCall}">Done</button> <table class="pure-table pure-table-horizontal"> <thead> <tr> <th>Dept</th> <th>Nom</th> <th>Téléphone</th> <th>Dernier appel</th> <th>Statut</th> <th>Action</th> <th>Nb appel</th> <th>Mail</th> <th>Adresse</th> <th>Observations</th> <th>Edit</th> </tr> </thead> <tr each="{item in results}"> <td>{item.dept}</td> <td>{item.name}</td> <td>{item.phone}</td> <td>{item.lastCall}</td> <td>{item.status}</td> <td> <form lass="pure-form"> <div class="pure-control-group"> <button class="button-small pure-button" name="ok" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-check-circle" aria-hidden="true" name="ok" objectid="{item.objectId}"></i> Done !</button> <button class="button-small pure-button" name="recall" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-times-circle" aria-hidden="true" name="recall" objectid="{item.objectId}"></i> Recall</button> </div> </form> </td> <td>{item.nbCall}</td> <td>{item.mail}</td> <td>{item.adresse}</td> <td>{item.obs}</td> <td> <button class="button-small pure-button" name="edit" objectid="{item.objectId}" onclick="{editItem}"><i class="fa fa-pencil" aria-hidden="true" objectid="{item.objectId}"></i></button> <button class="button-small pure-button" name="remove" objectid="{item.objectId}" onclick="{removeItem}"><i class="fa fa-trash" aria-hidden="true" name="remove" objectid="{item.objectId}"></i></button> </td> </tr> </table> </div>', '', '', function(opts) {
 
@@ -203,7 +242,7 @@ module.exports = riot.tag2('showassos', '<div> <p>{count}</p> <button onclick="{
   }
 
 });
-},{"./Association.js":1,"moment":10,"riot":15}],5:[function(require,module,exports){
+},{"./Association.js":1,"moment":11,"riot":16}],6:[function(require,module,exports){
 (function (global,Buffer){
 // Backendless.js 3.1.15
 
@@ -4873,7 +4912,7 @@ module.exports = riot.tag2('showassos', '<div> <p>{count}</p> <button onclick="{
     return Backendless;
 });
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"buffer":7,"url":16}],6:[function(require,module,exports){
+},{"buffer":8,"url":17}],7:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -4989,7 +5028,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -6782,7 +6821,7 @@ function isnan (val) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":6,"ieee754":8,"isarray":9}],8:[function(require,module,exports){
+},{"base64-js":7,"ieee754":9,"isarray":10}],9:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -6868,14 +6907,14 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 //! moment.js
 //! version : 2.15.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -11110,7 +11149,7 @@ module.exports = Array.isArray || function (arr) {
     return _moment;
 
 }));
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -11647,7 +11686,7 @@ module.exports = Array.isArray || function (arr) {
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -11733,7 +11772,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -11820,13 +11859,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":12,"./encode":13}],15:[function(require,module,exports){
+},{"./decode":13,"./encode":14}],16:[function(require,module,exports){
 /* Riot v2.6.2, @license MIT */
 
 ;(function(window, undefined) {
@@ -14497,7 +14536,7 @@ riot.Tag = Tag
 
 })(typeof window != 'undefined' ? window : void 0);
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -15231,7 +15270,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":17,"punycode":11,"querystring":14}],17:[function(require,module,exports){
+},{"./util":18,"punycode":12,"querystring":15}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = {

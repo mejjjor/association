@@ -113,7 +113,7 @@
   	this.lastCallTs = ''
   	this.objectId = ''
   	self.update()
-    console.log("asso has registered");
+    console.log("asso has registered")
     opts.eventBus.trigger('showAll')
 }
   </script>

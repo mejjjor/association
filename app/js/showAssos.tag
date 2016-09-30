@@ -78,6 +78,7 @@
   this.conditions.dept = ''
   this.conditions.name = ''
   this.conditions.phone = ''
+  this.conditions.active = 'active != false'
   
   
   opts.eventBus.on('showAll', function(){
@@ -156,8 +157,10 @@
   removeItem(e){
     if (window.confirm('Etes vous sûr de supprimer cette association ?')){
       var item = findByObjectId(self.results, e.target.attributes.objectId.value)
-      if(item != -1)
-        opts.Backendless.Persistence.of(Association).remove(item).then(assoDeleted)
+      if(item != -1){
+        item.active = false
+        opts.Backendless.Persistence.of(Association).save(item).then(assoDeleted)
+      }
     }
   }
 

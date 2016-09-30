@@ -111,7 +111,8 @@
 	    adresse: this.adresse,
 	    obs: this.obs,
 	    status: this.status,
-	    nbCall: this.nbCall
+	    nbCall: this.nbCall,
+	    active: true
 	});
         if (this.objectId != '')
 		    associationObject.objectId = this.objectId

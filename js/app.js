@@ -2,26 +2,31 @@
 "use strict";
 
 module.exports = function Association(args) {
-	args = args || {};
-	this.name = args.name || "";
-	this.dept = args.dept || "";
-	this.phone = args.phone || "";
-	this.mail = args.mail || "";
-	this.lastCall = args.lastCall || "";
-	this.lastCallTs = args.lastCallTs || "";
-	this.nbCall = args.nbCall || 0;
-	this.adresse = args.adresse || "";
-	this.obs = args.obs || "";
-	this.status = args.status || "";
-	if (args.objectId) this.objectId = args.objectId;
+			args = args || {};
+			this.name = args.name || "";
+			this.dept = args.dept || "";
+			this.phone = args.phone || "";
+			this.mail = args.mail || "";
+			this.lastCall = args.lastCall || "";
+			this.lastCallTs = args.lastCallTs || "";
+			this.nbCall = args.nbCall || 0;
+			this.adresse = args.adresse || "";
+			this.obs = args.obs || "";
+			this.status = args.status || "";
+			this.active = args.active || "";
+			this.objectId = args.objectId;
 };
 
 },{}],2:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned" onsubmit="{addAsso}"> <fieldset> <div class="pure-control-group"> <label for="name">Nom: </label> <input type="text" name="name" value="{name}" onkeyup="{edit}" placeholder="Utopia" required> </div"> <div class="pure-control-group"> <label for="dept">Département: </label> <input type="text" name="dept" value="{dept}" onkeyup="{edit}" placeholder="75"> </div> <div class="pure-control-group"> <label for="phone">Téléphone: </label> <input type="tel" name="phone" value="{phone}" onkeyup="{edit}" required> </div> <div class="pure-control-group"> <label for="mail">Mail: </label> <input name="mail" value="{mail}" onkeyup="{edit}" type="{\'email\'}"> </div> <div class="pure-control-group"> <label for="adresse">adresse: </label> <input type="text" name="adresse" value="{adresse}" onkeyup="{edit}"> </div> <div class="pure-control-group"> <label for="lastCall">Dernier Appel: </label> <input name="lastCall" value="{lastCall}" onchange="{edit}" type="{\'date\'}"> </div> <div class="pure-control-group"> <label for="status">Statut: </label> <select name="status" value="{status}" onchange="{edit}"> <option value="ok">Ok</option> <option value="recall">To recall</option> </select> </div> <div class="pure-control-group"> <label for="obs">Observations: </label> <textarea name="obs" onkeyup="{edit}">{obs}</textarea> </div> <div class="pure-controls"> <button type="submit" class="pure-button pure-button-primary">Ajouter</button> </div> </fieldset> </form>', '', '', function(opts) {
+module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned" onsubmit="{addAsso}"> <fieldset> <div class="pure-control-group"> <label for="name">Nom: </label> <input type="text" name="name" value="{name}" onkeyup="{edit}" placeholder="Utopia" required> </div"> <div class="pure-control-group"> <label for="dept">Département: </label> <input type="text" name="dept" value="{dept}" onkeyup="{edit}" placeholder="75"> </div> <div class="pure-control-group"> <label for="phone">Téléphone: </label> <input type="tel" name="phone" value="{phone}" onkeyup="{edit}" required> </div> <div class="pure-control-group"> <label for="mail">Mail: </label> <input name="mail" value="{mail}" onkeyup="{edit}" type="{\'email\'}"> </div> <div class="pure-control-group"> <label for="adresse">adresse: </label> <input type="text" name="adresse" value="{adresse}" onkeyup="{edit}"> </div> <div class="pure-control-group"> <label for="lastCall">Dernier Appel: </label> <input name="lastCall" value="{lastCall}" onchange="{edit}" type="{\'date\'}"> </div> <div class="pure-control-group"> <label for="status">Statut: </label> <select name="status" value="{status}" onchange="{edit}"> <option value="ok">Ok</option> <option value="recall">To recall</option> </select> </div> <div class="pure-control-group"> <label for="obs">Observations: </label> <textarea rows="5" cols="50" name="obs" onkeyup="{edit}">{obs}</textarea> </div> <div class="pure-controls"> <button onclick="{cancel}" class="pure-button">Annuler</button> <button if="{!objectId}" type="submit" class="pure-button pure-button-primary">Ajouter</button> <button if="{objectId}" type="submit" class="pure-button pure-button-primary button-warning">Modifier</button> </div> </fieldset> </form>', '', '', function(opts) {
   	var Association = require('./Association.js')
   	var moment = require('moment')
   	var self = this
+
+  	this.on('mount', function() {
+	  	initFields()
+	})
 
   	opts.eventBus.on('editAsso', function(item){
   		self.name = item.name
@@ -40,23 +45,30 @@ module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned"
 
   	})
 
-  	this.name = ''
-  	this.dept = ''
-  	this.phone = ''
-  	this.mail = ''
-  	this.status = ''
-  	this.adresse = ''
-  	this.obs = ''
-  	this.lastCall = ''
-  	this.lastCallTs = ''
-	this.nbCall = 0
+	function initFields(){
+	  	self.name = ''
+	  	self.dept = ''
+	  	self.phone = ''
+	  	self.mail = ''
+	  	self.status = ''
+	  	self.adresse = ''
+	  	self.obs = ''
+	  	self.lastCall = ''
+	  	self.lastCallTs = ''
+		self.nbCall = 0
+		self.update()
+	}
+
+	this.cancel = function(e){
+		initFields()
+		this.objectId = ''
+	}.bind(this)
 
 	this.edit = function(e) {
       this[e.target.name] = e.target.value
     }.bind(this)
 
 	this.addAsso = function(e) {
-	console.log(this.lastCall)
 		if (this.lastCall == '' || this.lastCall == 'Invalid date'){
 			this.lastCallTs = new Date(0)
 		}
@@ -75,9 +87,12 @@ module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned"
 	    adresse: this.adresse,
 	    obs: this.obs,
 	    status: this.status,
-	    objectId: this.objectId,
-	    nbCall: this.nbCall
+	    nbCall: this.nbCall,
+	    active: true
 	});
+        if (this.objectId != '')
+		    associationObject.objectId = this.objectId
+
 	    var savedData = opts.Backendless.Persistence.of(Association).save(associationObject).then(assoRegistered);
 	}.bind(this)
 
@@ -88,8 +103,8 @@ module.exports = riot.tag2('addasso', '<form class="pure-form pure-form-aligned"
   	self.adresse = ''
   	self.obs = ''
   	self.status = ''
-  	this.lastCallTs = ''
-  	this.objectId = ''
+  	self.lastCallTs = ''
+  	self.objectId = ''
   	self.update()
     console.log("asso has registered")
     opts.eventBus.trigger('showAll')
@@ -160,7 +175,7 @@ function userLoggedIn(user) {
 });
 },{"riot":16}],5:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag2('showassos', '<div> <p>{count}</p> <button onclick="{showAll}">All</button> <button onclick="{showMustCall}">To recall</button> <button onclick="{showDoneCall}">Done</button> <table class="pure-table pure-table-horizontal"> <thead> <tr> <th>Dept</th> <th>Nom</th> <th>Téléphone</th> <th>Dernier appel</th> <th>Statut</th> <th>Action</th> <th>Nb appel</th> <th>Mail</th> <th>Adresse</th> <th>Observations</th> <th>Edit</th> </tr> </thead> <tr each="{item in results}"> <td>{item.dept}</td> <td>{item.name}</td> <td>{item.phone}</td> <td>{item.lastCall}</td> <td>{item.status}</td> <td> <form lass="pure-form"> <div class="pure-control-group"> <button class="button-small pure-button" name="ok" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-check-circle" aria-hidden="true" name="ok" objectid="{item.objectId}"></i> Done !</button> <button class="button-small pure-button" name="recall" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-times-circle" aria-hidden="true" name="recall" objectid="{item.objectId}"></i> Recall</button> </div> </form> </td> <td>{item.nbCall}</td> <td>{item.mail}</td> <td>{item.adresse}</td> <td>{item.obs}</td> <td> <button class="button-small pure-button" name="edit" objectid="{item.objectId}" onclick="{editItem}"><i class="fa fa-pencil" aria-hidden="true" objectid="{item.objectId}"></i></button> <button class="button-small pure-button" name="remove" objectid="{item.objectId}" onclick="{removeItem}"><i class="fa fa-trash" aria-hidden="true" name="remove" objectid="{item.objectId}"></i></button> </td> </tr> </table> </div>', '', '', function(opts) {
+module.exports = riot.tag2('showassos', '<div> <p>{count}</p> <button onclick="{showAll}">All</button> <button onclick="{showMustCall}">To recall</button> <button onclick="{showDoneCall}">Done</button> <table class="pure-table pure-table-horizontal"> <thead> <tr> <th>Dept</th> <th>Nom</th> <th>Téléphone</th> <th>Dernier appel</th> <th>Statut</th> <th>Action</th> <th>Nb appel</th> <th>Mail</th> <th>Adresse</th> <th>Observations</th> <th>Edit</th> </tr> </thead> <tr> <td><input class="fill-input" type="text" onblur="{filterDept}"></td> <td><input class="fill-input" type="text" onblur="{filterName}"></td> <td><input class="fill-input" type="text" onblur="{filterPhone}"></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> <tr each="{item in results}"> <td>{item.dept}</td> <td>{item.name}</td> <td>{item.phone}</td> <td>{item.lastCall}</td> <td>{item.status}</td> <td> <form lass="pure-form"> <div class="pure-control-group"> <button class="button-small pure-button" name="ok" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-check-circle" aria-hidden="true" name="ok" objectid="{item.objectId}"></i> Done !</button> <button class="button-small pure-button" name="recall" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-times-circle" aria-hidden="true" name="recall" objectid="{item.objectId}"></i> Recall</button> </div> </form> </td> <td>{item.nbCall}</td> <td>{item.mail}</td> <td>{item.adresse}</td> <td>{item.obs}</td> <td> <a href="#addAsso"><button class="button-small pure-button" name="edit" objectid="{item.objectId}" onclick="{editItem}"><i class="fa fa-pencil" aria-hidden="true" objectid="{item.objectId}"></i></button></a> <button class="button-small pure-button" name="remove" objectid="{item.objectId}" onclick="{removeItem}"><i class="fa fa-trash" aria-hidden="true" name="remove" objectid="{item.objectId}"></i></button> </td> </tr> </table> </div>', '', '', function(opts) {
 
   var Association = require('./Association.js')
   var moment = require('moment')
@@ -172,24 +187,40 @@ module.exports = riot.tag2('showassos', '<div> <p>{count}</p> <button onclick="{
   var dataQuery = new Backendless.DataQuery();
   dataQuery.options = {}
   dataQuery.options.pageSize = 100;
+  this.conditions = []
+  this.conditions.status = ''
+  this.conditions.dept = ''
+  this.conditions.name = ''
+  this.conditions.phone = ''
+  this.conditions.active = 'active != false'
 
   opts.eventBus.on('showAll', function(){
     self.showAll('')
   })
 
-  this.showAll = function(e) {
-    dataQuery.condition = ""
+  function execQuery(){
+    dataQuery.condition = ''
+    for(var c in self.conditions){
+      if (self.conditions[c] != '')
+        dataQuery.condition += self.conditions[c]+' and '
+    }
+    dataQuery.condition = dataQuery.condition.replace(/(?:and )$/,'')
     Backendless.Persistence.of(Association).find(dataQuery).then(getAssociations);
+  }
+
+  this.showAll = function(e) {
+    self.conditions.status = ""
+    execQuery()
   }.bind(this)
 
   this.showMustCall = function(e){
-    dataQuery.condition = "lastCallTs <= "+dateFilter.getTime()+" and status = 'recall'";
-    Backendless.Persistence.of(Association).find(dataQuery).then(getAssociations)
+    self.conditions.status = "lastCallTs <= "+dateFilter.getTime()+" and status = 'recall'"
+    execQuery()
   }.bind(this)
 
   this.showDoneCall = function(e){
-    dataQuery.condition = "status = 'ok'";
-    Backendless.Persistence.of(Association).find(dataQuery).then(getAssociations)
+    self.conditions.status = "status = 'ok'"
+    execQuery()
   }.bind(this)
 
   this.updateStatus = function(e){
@@ -200,21 +231,49 @@ module.exports = riot.tag2('showassos', '<div> <p>{count}</p> <button onclick="{
       item.lastCall = moment(Date.now()).format('YYYY-MM-DD')
       item.nbCall++
 
-      opts.Backendless.Persistence.of(Association).save(item).then(assoUpdated);
+      opts.Backendless.Persistence.of(Association).save(item).then(assoUpdated)
     }
+  }.bind(this)
+
+  this.filterDept = function(e){
+    if(e.target.value != '')
+      this.conditions.dept = "dept like '"+e.target.value+"'"
+    else
+      this.conditions.dept = ""
+    execQuery()
+  }.bind(this)
+
+  this.filterName = function(e){
+    if(e.target.value != '')
+      this.conditions.name = "name like '"+e.target.value+"'"
+    else
+    this.conditions.name = ""
+    execQuery()
+  }.bind(this)
+  this.filterPhone = function(e){
+    if(e.target.value != '')
+      this.conditions.phone = "phone like '"+e.target.value+"'"
+    else
+      this.conditions.phone = ""
+    execQuery()
   }.bind(this)
 
   this.editItem = function(e){
     var item = findByObjectId(self.results, e.target.attributes.objectId.value)
-    if(item != -1)
+    if(item != -1){
       opts.eventBus.trigger('editAsso',item)
+      var top = document.getElementById('addAsso').offsetTop;
+      window.scrollTo(0, top);
+    }
   }.bind(this)
 
   this.removeItem = function(e){
     if (window.confirm('Etes vous sûr de supprimer cette association ?')){
       var item = findByObjectId(self.results, e.target.attributes.objectId.value)
-      if(item != -1)
-        opts.Backendless.Persistence.of(Association).remove(item).then(assoDeleted);
+      if(item != -1){
+        item.active = false
+        opts.Backendless.Persistence.of(Association).save(item).then(assoDeleted)
+      }
     }
   }.bind(this)
 

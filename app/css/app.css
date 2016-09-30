@@ -1,3 +1,12 @@
-h1{
-	color: green;
+h1 {
+    color: green;
+}
+
+.button-warning {
+    background: rgb(223, 117, 20);
+}
+
+.fill-input {
+	position: relative;
+	width: 100%;
 }

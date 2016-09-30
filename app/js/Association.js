@@ -10,6 +10,5 @@ module.exports = function Association(args) {
 			      this.adresse = args.adresse || "";
 			      this.obs = args.obs || "";
 			      this.status = args.status || "";
-			      if (args.objectId)
-				      this.objectId = args.objectId;
+			      this.objectId = args.objectId;
 			    }

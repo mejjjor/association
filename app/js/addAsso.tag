@@ -1,4 +1,4 @@
-<addAsso>
+<addAsso >
 <form class="pure-form pure-form-aligned" onsubmit='{ addAsso }'>
 <fieldset>
 	<div class="pure-control-group">
@@ -34,10 +34,12 @@
     </div>
     <div class="pure-control-group">
 	    <label for='obs'>Observations: </label>
-	    <textarea name='obs' onkeyup='{ edit }'>{ obs }</textarea>
+	    <textarea rows="5" cols="50" name='obs' onkeyup='{ edit }'>{ obs }</textarea>
     </div>
     <div class="pure-controls">
-		<button type="submit" class="pure-button pure-button-primary">Ajouter</button>
+		<button onclick='{ cancel }' class="pure-button">Annuler</button>
+		<button if='{ !objectId }' type="submit" class="pure-button pure-button-primary">Ajouter</button>
+		<button if='{ objectId }' type="submit" class="pure-button pure-button-primary button-warning">Modifier</button>
 	</div>
 </fieldset>
 </form>
@@ -45,6 +47,10 @@
   	var Association = require('./Association.js')
   	var moment = require('moment')
   	var self = this
+
+  	this.on('mount', function() {
+	  	initFields()
+	})
 
   	opts.eventBus.on('editAsso', function(item){
   		self.name = item.name
@@ -63,23 +69,30 @@
 
   	})
 
-  	this.name = ''
-  	this.dept = ''
-  	this.phone = ''
-  	this.mail = ''
-  	this.status = ''
-  	this.adresse = ''
-  	this.obs = ''
-  	this.lastCall = ''
-  	this.lastCallTs = ''
-	this.nbCall = 0
+	function initFields(){
+	  	self.name = ''
+	  	self.dept = ''
+	  	self.phone = ''
+	  	self.mail = ''
+	  	self.status = ''
+	  	self.adresse = ''
+	  	self.obs = ''
+	  	self.lastCall = ''
+	  	self.lastCallTs = ''
+		self.nbCall = 0
+		self.update()
+	}
+
+	cancel(e){
+		initFields()
+		this.objectId = ''
+	}
 	
 	edit(e) {
       this[e.target.name] = e.target.value
     }
 
 	addAsso(e) {
-	console.log(this.lastCall)
 		if (this.lastCall == '' || this.lastCall == 'Invalid date'){
 			this.lastCallTs = new Date(0)
 		}
@@ -98,9 +111,11 @@
 	    adresse: this.adresse,
 	    obs: this.obs,
 	    status: this.status,
-	    objectId: this.objectId,
 	    nbCall: this.nbCall
 	});
+        if (this.objectId != '')
+		    associationObject.objectId = this.objectId
+
 	    var savedData = opts.Backendless.Persistence.of(Association).save(associationObject).then(assoRegistered);
 	}
 
@@ -111,8 +126,8 @@
   	self.adresse = ''
   	self.obs = ''
   	self.status = ''
-  	this.lastCallTs = ''
-  	this.objectId = ''
+  	self.lastCallTs = ''
+  	self.objectId = ''
   	self.update()
     console.log("asso has registered")
     opts.eventBus.trigger('showAll')

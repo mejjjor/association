@@ -30,13 +30,18 @@ unConnect(e){
     self.update()
 }
 
+opts.eventBus.on('unConnect',function(){
+	self.unConnect('')
+	window.scrollTo(0, document.getElementById('title').offsetTop);
+})
+
 function userLoggedIn(user) {
 	opts.currentUser = user.objectId
     console.log("user has logged in")
     self.update()
     }
 
-    function gotError(err) // see more on error handling
+    function gotError(err)
     {
         console.log("error message - " + err.message);
         console.log("error code - " + err.statusCode);

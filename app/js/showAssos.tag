@@ -92,7 +92,7 @@
         dataQuery.condition += self.conditions[c]+' and '
     }
     dataQuery.condition = dataQuery.condition.replace(/(?:and )$/,'')
-    Backendless.Persistence.of(Association).find(dataQuery).then(getAssociations);
+    Backendless.Persistence.of(Association).find(dataQuery).then(getAssociations,gotError);
   }
 
   showAll(e) {
@@ -149,8 +149,7 @@
     var item = findByObjectId(self.results, e.target.attributes.objectId.value)
     if(item != -1){
       opts.eventBus.trigger('editAsso',item)
-      var top = document.getElementById('addAsso').offsetTop;
-      window.scrollTo(0, top);
+      window.scrollTo(0, document.getElementById('addAsso').offsetTop);
     }
   }
 
@@ -177,6 +176,11 @@
     self.results = data.data
     console.log(self.results)
     self.update()
+  }
+
+  function gotError(err){
+    if (err.code == 3064)
+      opts.eventBus.trigger('unConnect')
   }
 
   function findByObjectId(data,id){

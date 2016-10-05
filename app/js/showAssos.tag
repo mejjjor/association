@@ -1,9 +1,10 @@
 <showAssos>
+    <h3>show assos</h3>
   <div>
 	<p>{ count }</p>
   <button onclick='{ showAll }'>All</button>
-  <button onclick='{ showMustCall }'>To recall</button>
-  <button onclick='{ showDoneCall }'>Done</button>
+  <button onclick='{ showMustCall }' if='{ modeEdit }'>To recall</button>
+  <button onclick='{ showDoneCall }' if='{ modeEdit }'>Done</button>
   
 
   <table class="pure-table pure-table-horizontal">
@@ -12,36 +13,36 @@
         <th>Dept</th>
         <th>Nom</th>
         <th>Téléphone</th>
-        <th>Dernier appel</th>
-        <th>Statut</th>
-        <th>Action</th>
-        <th>Nb appel</th>
+        <th if='{ modeEdit }'>Dernier appel</th>
+        <th if='{ modeEdit }'>Statut</th>
+        <th if='{ modeEdit }'>Action</th>
+        <th if='{ modeEdit }'>Nb appel</th>
         <th>Mail</th>
         <th>Adresse</th>
         <th>Observations</th>
-        <th>Edit</th>
+        <th if='{ modeEdit }'>Edit</th>
       </tr>
     </thead>
       <tr>
         <td><input class='fill-input' type='text' onblur='{ filterDept }'></td>
         <td><input class='fill-input' type='text' onblur='{ filterName }'></td>
         <td><input class='fill-input' type='text' onblur='{ filterPhone }'></td>
+        <td if='{ modeEdit }'></td>
+        <td if='{ modeEdit }'></td>
+        <td if='{ modeEdit }'></td>
+        <td if='{ modeEdit }'></td>
         <td></td>
         <td></td>
         <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td if='{ modeEdit }'></td>
       </tr>
       <tr each={ item in results }>
           <td>{ item.dept }</td>
           <td>{ item.name }</td>
           <td>{ item.phone }</td>
-          <td>{ item.lastCall }</td>
-          <td>{ item.status }</td>
-          <td> 
+          <td if='{ modeEdit }'>{ item.lastCall }</td>
+          <td if='{ modeEdit }'>{ item.status }</td>
+          <td if='{ modeEdit }'> 
             <form lass="pure-form">
             <div class="pure-control-group">
               <button class='button-small pure-button' name='ok' objectId='{ item.objectId }' onclick='{ updateStatus }'><i class="fa fa-check-circle" aria-hidden="true" name='ok' objectId='{ item.objectId }'></i> Done !</button>
@@ -50,11 +51,11 @@
               </div>
             </form>
           </td>
-          <td>{ item.nbCall }</td>
+          <td if='{ modeEdit }'>{ item.nbCall }</td>
           <td>{ item.mail }</td>
           <td>{ item.adresse }</td>
           <td>{ item.obs }</td>
-          <td> <a href='#addAsso'><button class='button-small pure-button' name='edit' objectId='{ item.objectId }' onclick='{ editItem }'><i class="fa fa-pencil" aria-hidden="true" objectId='{ item.objectId }'></i></button></a>
+          <td if='{ modeEdit }'> <a href='#addAsso'><button class='button-small pure-button' name='edit' objectId='{ item.objectId }' onclick='{ editItem }'><i class="fa fa-pencil" aria-hidden="true" objectId='{ item.objectId }'></i></button></a>
 
 
           <button class='button-small pure-button' name='remove' objectId='{ item.objectId }' onclick='{ removeItem }'><i class="fa fa-trash" aria-hidden="true" name='remove' objectId='{ item.objectId }'></i></button> </td>
@@ -79,7 +80,12 @@
   this.conditions.name = ''
   this.conditions.phone = ''
   this.conditions.active = 'active != false'
+  this.modeEdit = false
   
+  opts.eventBus.on('changeMode', function(mode) {
+      self.modeEdit = mode
+      self.update()
+  })
   
   opts.eventBus.on('showAll', function(){
     self.showAll('')

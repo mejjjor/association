@@ -1,4 +1,5 @@
 <login>
+<button onclick='{ changeMode }'>change mode</button>
 <form>
 	<div if='{ opts.currentUser == undefined }'>
     <input type="login" name="login" value='{ login }' onchange='{ edit }' placeholder="login">
@@ -13,6 +14,12 @@
 this.login= ''
 this.password = ''
 var self = this
+var mode = false
+
+changeMode(e){
+    mode = !mode
+    opts.eventBus.trigger('changeMode',mode)
+}
 
 edit(e){
 	this[e.target.name] = e.target.value

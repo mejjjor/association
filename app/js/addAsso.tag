@@ -1,4 +1,5 @@
-<addAsso >
+<addAsso if='{ modeEdit }'>
+    <h3 id='addAsso'>add asso</h3>
 <form class="pure-form pure-form-aligned" onsubmit='{ addAsso }'>
 <fieldset>
 	<div class="pure-control-group">
@@ -47,10 +48,18 @@
   	var Association = require('./Association.js')
   	var moment = require('moment')
   	var self = this
+  	this.modeEdit = false
 
   	this.on('mount', function() {
 	  	initFields()
 	})
+
+	opts.eventBus.on('changeMode', function(mode) {
+	  	self.modeEdit = mode
+	  	self.update()
+	})
+
+	
 
   	opts.eventBus.on('editAsso', function(item){
   		self.name = item.name

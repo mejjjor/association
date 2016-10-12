@@ -19,6 +19,10 @@
 	    <input type='email' name='mail' value='{ mail }' onkeyup='{ edit }'>
     </div>
     <div class="pure-control-group">
+	    <label for='webSite'>Site web: </label>
+	    <input type='text' name='webSite' value='{ webSite }' onkeyup='{ edit }'>
+    </div>
+    <div class="pure-control-group">
 	    <label for='adresse'>adresse: </label>
 	    <input type='text' name='adresse' value='{ adresse }' onkeyup='{ edit }'>
     </div>
@@ -72,6 +76,7 @@
 	  	self.lastCall = item.lastCall
 	  	self.lastCallTs = item.lastCallTs
 		self.nbCall = item.nbCall
+		self.webSite = item.webSite
 		self.objectId = item.objectId
 
 		self.update()
@@ -87,6 +92,7 @@
 	  	self.adresse = ''
 	  	self.obs = ''
 	  	self.lastCall = ''
+	  	self.webSite = ''
 	  	self.lastCallTs = ''
 		self.nbCall = 0
 		self.update()
@@ -121,6 +127,7 @@
 	    obs: this.obs,
 	    status: this.status,
 	    nbCall: this.nbCall,
+	    webSite: this.webSite,
 	    active: true
 	});
         if (this.objectId != '')
@@ -137,6 +144,7 @@
   	self.obs = ''
   	self.status = ''
   	self.lastCallTs = ''
+  	self.webSite = ''
   	self.objectId = ''
   	self.update()
     console.log("asso has registered")

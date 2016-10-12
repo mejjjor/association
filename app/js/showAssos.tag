@@ -18,6 +18,7 @@
         <th if='{ modeEdit }'>Action</th>
         <th if='{ modeEdit }'>Nb appel</th>
         <th>Mail</th>
+        <th>Site web</th>
         <th>Adresse</th>
         <th>Observations</th>
         <th if='{ modeEdit }'>Edit</th>
@@ -31,6 +32,7 @@
         <td if='{ modeEdit }'></td>
         <td if='{ modeEdit }'></td>
         <td if='{ modeEdit }'></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -53,6 +55,7 @@
           </td>
           <td if='{ modeEdit }'>{ item.nbCall }</td>
           <td>{ item.mail }</td>
+          <td>{ item.webSite }</td>
           <td>{ item.adresse }</td>
           <td>{ item.obs }</td>
           <td if='{ modeEdit }'> <a href='#addAsso'><button class='button-small pure-button' name='edit' objectId='{ item.objectId }' onclick='{ editItem }'><i class="fa fa-pencil" aria-hidden="true" objectId='{ item.objectId }'></i></button></a>

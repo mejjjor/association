@@ -14,12 +14,13 @@ module.exports = function Association(args) {
 			this.obs = args.obs || "";
 			this.status = args.status || "";
 			this.active = args.active || "";
+			this.webSite = args.webSite || "";
 			this.objectId = args.objectId;
 };
 
 },{}],2:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag2('addasso', '<h3 id="addAsso">add asso</h3> <form class="pure-form pure-form-aligned" onsubmit="{addAsso}"> <fieldset> <div class="pure-control-group"> <label for="name">Nom: </label> <input type="text" name="name" value="{name}" onkeyup="{edit}" placeholder="Utopia" required> </div"> <div class="pure-control-group"> <label for="dept">Département: </label> <input type="text" name="dept" value="{dept}" onkeyup="{edit}" placeholder="75"> </div> <div class="pure-control-group"> <label for="phone">Téléphone: </label> <input type="tel" name="phone" value="{phone}" onkeyup="{edit}" required> </div> <div class="pure-control-group"> <label for="mail">Mail: </label> <input name="mail" value="{mail}" onkeyup="{edit}" type="{\'email\'}"> </div> <div class="pure-control-group"> <label for="adresse">adresse: </label> <input type="text" name="adresse" value="{adresse}" onkeyup="{edit}"> </div> <div class="pure-control-group"> <label for="lastCall">Dernier Appel: </label> <input name="lastCall" value="{lastCall}" onchange="{edit}" type="{\'date\'}"> </div> <div class="pure-control-group"> <label for="status">Statut: </label> <select name="status" value="{status}" onchange="{edit}"> <option value="ok">Ok</option> <option value="recall">To recall</option> </select> </div> <div class="pure-control-group"> <label for="obs">Observations: </label> <textarea rows="5" cols="50" name="obs" onkeyup="{edit}">{obs}</textarea> </div> <div class="pure-controls"> <button onclick="{cancel}" class="pure-button">Annuler</button> <button if="{!objectId}" type="submit" class="pure-button pure-button-primary">Ajouter</button> <button if="{objectId}" type="submit" class="pure-button pure-button-primary button-warning">Modifier</button> </div> </fieldset> </form>', '', 'if="{modeEdit}"', function(opts) {
+module.exports = riot.tag2('addasso', '<h3 id="addAsso">add asso</h3> <form class="pure-form pure-form-aligned" onsubmit="{addAsso}"> <fieldset> <div class="pure-control-group"> <label for="name">Nom: </label> <input type="text" name="name" value="{name}" onkeyup="{edit}" placeholder="Utopia" required> </div"> <div class="pure-control-group"> <label for="dept">Département: </label> <input type="text" name="dept" value="{dept}" onkeyup="{edit}" placeholder="75"> </div> <div class="pure-control-group"> <label for="phone">Téléphone: </label> <input type="tel" name="phone" value="{phone}" onkeyup="{edit}" required> </div> <div class="pure-control-group"> <label for="mail">Mail: </label> <input name="mail" value="{mail}" onkeyup="{edit}" type="{\'email\'}"> </div> <div class="pure-control-group"> <label for="webSite">Site web: </label> <input type="text" name="webSite" value="{webSite}" onkeyup="{edit}"> </div> <div class="pure-control-group"> <label for="adresse">adresse: </label> <input type="text" name="adresse" value="{adresse}" onkeyup="{edit}"> </div> <div class="pure-control-group"> <label for="lastCall">Dernier Appel: </label> <input name="lastCall" value="{lastCall}" onchange="{edit}" type="{\'date\'}"> </div> <div class="pure-control-group"> <label for="status">Statut: </label> <select name="status" value="{status}" onchange="{edit}"> <option value="ok">Ok</option> <option value="recall">To recall</option> </select> </div> <div class="pure-control-group"> <label for="obs">Observations: </label> <textarea rows="5" cols="50" name="obs" onkeyup="{edit}">{obs}</textarea> </div> <div class="pure-controls"> <button onclick="{cancel}" class="pure-button">Annuler</button> <button if="{!objectId}" type="submit" class="pure-button pure-button-primary">Ajouter</button> <button if="{objectId}" type="submit" class="pure-button pure-button-primary button-warning">Modifier</button> </div> </fieldset> </form>', '', 'if="{modeEdit}"', function(opts) {
   	var Association = require('./Association.js')
   	var moment = require('moment')
   	var self = this
@@ -45,6 +46,7 @@ module.exports = riot.tag2('addasso', '<h3 id="addAsso">add asso</h3> <form clas
 	  	self.lastCall = item.lastCall
 	  	self.lastCallTs = item.lastCallTs
 		self.nbCall = item.nbCall
+		self.webSite = item.webSite
 		self.objectId = item.objectId
 
 		self.update()
@@ -60,6 +62,7 @@ module.exports = riot.tag2('addasso', '<h3 id="addAsso">add asso</h3> <form clas
 	  	self.adresse = ''
 	  	self.obs = ''
 	  	self.lastCall = ''
+	  	self.webSite = ''
 	  	self.lastCallTs = ''
 		self.nbCall = 0
 		self.update()
@@ -94,6 +97,7 @@ module.exports = riot.tag2('addasso', '<h3 id="addAsso">add asso</h3> <form clas
 	    obs: this.obs,
 	    status: this.status,
 	    nbCall: this.nbCall,
+	    webSite: this.webSite,
 	    active: true
 	});
         if (this.objectId != '')
@@ -110,6 +114,7 @@ module.exports = riot.tag2('addasso', '<h3 id="addAsso">add asso</h3> <form clas
   	self.obs = ''
   	self.status = ''
   	self.lastCallTs = ''
+  	self.webSite = ''
   	self.objectId = ''
   	self.update()
     console.log("asso has registered")
@@ -192,7 +197,7 @@ function userLoggedIn(user) {
 });
 },{"riot":16}],5:[function(require,module,exports){
 var riot = require('riot');
-module.exports = riot.tag2('showassos', '<h3>show assos</h3> <div> <p>{count}</p> <button onclick="{showAll}">All</button> <button onclick="{showMustCall}" if="{modeEdit}">To recall</button> <button onclick="{showDoneCall}" if="{modeEdit}">Done</button> <table class="pure-table pure-table-horizontal"> <thead> <tr> <th>Dept</th> <th>Nom</th> <th>Téléphone</th> <th if="{modeEdit}">Dernier appel</th> <th if="{modeEdit}">Statut</th> <th if="{modeEdit}">Action</th> <th if="{modeEdit}">Nb appel</th> <th>Mail</th> <th>Adresse</th> <th>Observations</th> <th if="{modeEdit}">Edit</th> </tr> </thead> <tr> <td><input class="fill-input" type="text" onblur="{filterDept}"></td> <td><input class="fill-input" type="text" onblur="{filterName}"></td> <td><input class="fill-input" type="text" onblur="{filterPhone}"></td> <td if="{modeEdit}"></td> <td if="{modeEdit}"></td> <td if="{modeEdit}"></td> <td if="{modeEdit}"></td> <td></td> <td></td> <td></td> <td if="{modeEdit}"></td> </tr> <tr each="{item in results}"> <td>{item.dept}</td> <td>{item.name}</td> <td>{item.phone}</td> <td if="{modeEdit}">{item.lastCall}</td> <td if="{modeEdit}">{item.status}</td> <td if="{modeEdit}"> <form lass="pure-form"> <div class="pure-control-group"> <button class="button-small pure-button" name="ok" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-check-circle" aria-hidden="true" name="ok" objectid="{item.objectId}"></i> Done !</button> <button class="button-small pure-button" name="recall" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-times-circle" aria-hidden="true" name="recall" objectid="{item.objectId}"></i> Recall</button> </div> </form> </td> <td if="{modeEdit}">{item.nbCall}</td> <td>{item.mail}</td> <td>{item.adresse}</td> <td>{item.obs}</td> <td if="{modeEdit}"> <a href="#addAsso"><button class="button-small pure-button" name="edit" objectid="{item.objectId}" onclick="{editItem}"><i class="fa fa-pencil" aria-hidden="true" objectid="{item.objectId}"></i></button></a> <button class="button-small pure-button" name="remove" objectid="{item.objectId}" onclick="{removeItem}"><i class="fa fa-trash" aria-hidden="true" name="remove" objectid="{item.objectId}"></i></button> </td> </tr> </table> </div>', '', '', function(opts) {
+module.exports = riot.tag2('showassos', '<h3>show assos</h3> <div> <p>{count}</p> <button onclick="{showAll}">All</button> <button onclick="{showMustCall}" if="{modeEdit}">To recall</button> <button onclick="{showDoneCall}" if="{modeEdit}">Done</button> <table class="pure-table pure-table-horizontal"> <thead> <tr> <th>Dept</th> <th>Nom</th> <th>Téléphone</th> <th if="{modeEdit}">Dernier appel</th> <th if="{modeEdit}">Statut</th> <th if="{modeEdit}">Action</th> <th if="{modeEdit}">Nb appel</th> <th>Mail</th> <th>Site web</th> <th>Adresse</th> <th>Observations</th> <th if="{modeEdit}">Edit</th> </tr> </thead> <tr> <td><input class="fill-input" type="text" onblur="{filterDept}"></td> <td><input class="fill-input" type="text" onblur="{filterName}"></td> <td><input class="fill-input" type="text" onblur="{filterPhone}"></td> <td if="{modeEdit}"></td> <td if="{modeEdit}"></td> <td if="{modeEdit}"></td> <td if="{modeEdit}"></td> <td></td> <td></td> <td></td> <td></td> <td if="{modeEdit}"></td> </tr> <tr each="{item in results}"> <td>{item.dept}</td> <td>{item.name}</td> <td>{item.phone}</td> <td if="{modeEdit}">{item.lastCall}</td> <td if="{modeEdit}">{item.status}</td> <td if="{modeEdit}"> <form lass="pure-form"> <div class="pure-control-group"> <button class="button-small pure-button" name="ok" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-check-circle" aria-hidden="true" name="ok" objectid="{item.objectId}"></i> Done !</button> <button class="button-small pure-button" name="recall" objectid="{item.objectId}" onclick="{updateStatus}"><i class="fa fa-times-circle" aria-hidden="true" name="recall" objectid="{item.objectId}"></i> Recall</button> </div> </form> </td> <td if="{modeEdit}">{item.nbCall}</td> <td>{item.mail}</td> <td>{item.webSite}</td> <td>{item.adresse}</td> <td>{item.obs}</td> <td if="{modeEdit}"> <a href="#addAsso"><button class="button-small pure-button" name="edit" objectid="{item.objectId}" onclick="{editItem}"><i class="fa fa-pencil" aria-hidden="true" objectid="{item.objectId}"></i></button></a> <button class="button-small pure-button" name="remove" objectid="{item.objectId}" onclick="{removeItem}"><i class="fa fa-trash" aria-hidden="true" name="remove" objectid="{item.objectId}"></i></button> </td> </tr> </table> </div>', '', '', function(opts) {
 
   var Association = require('./Association.js')
   var moment = require('moment')
